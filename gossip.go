@@ -36,12 +36,17 @@ func (n *Node) startGossipListener() {
 			fmt.Printf("Error reading UDP message: %v\n", err)
 			continue
 		}
+		data := make([]byte, bytesRead)
+		copy(data, buffer[:bytesRead])
 
-		go n.handleGossipMessage(buffer[:bytesRead], addr)
+		go n.handleGossipMessage(data, addr)
 	}
 }
 
 func (n *Node) handleGossipMessage(data []byte, addr *net.UDPAddr) {
+	if n.partitioned {
+		return // Ignore messages during partition
+	}
 	var message GossipMessage
 	err := json.Unmarshal(data, &message)
 	if err != nil {
@@ -52,7 +57,7 @@ func (n *Node) handleGossipMessage(data []byte, addr *net.UDPAddr) {
 	// Update local counter with received state
 	n.counter.SetState(message.Counter)
 
-	fmt.Printf("Node %s received gossip from %s\n",
+	fmt.Printf("Node %s received gossip from %s, new value: %d\n",
 		n.nodeID, message.FromNode, n.counter.Value())
 }
 
