@@ -31,14 +31,13 @@ func (n *Node) startGossipListener() {
 
 	buffer := make([]byte, 1024)
 	for {
-		n, addr, err := conn.ReadFromUDP(buffer)
+		bytesRead, addr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
 			fmt.Printf("Error reading UDP message: %v\n", err)
 			continue
 		}
 
-		go n.handleGossipMessage(buffer[:n], addr)
-
+		go n.handleGossipMessage(buffer[:bytesRead], addr)
 	}
 }
 
