@@ -52,7 +52,14 @@ func main() {
 
 	// Wait for partition to heal
 	time.Sleep(3 * time.Second)
+	// After partition healed:
 	fmt.Println("\nAfter partition healed:")
+	printStatus(node1, node2, node3)
+
+	// Add this:
+	fmt.Println("\n⏳ Waiting for full convergence...")
+	time.Sleep(4 * time.Second) // Give Alice time to receive full gossip
+	fmt.Println("Final state:")
 	printStatus(node1, node2, node3)
 
 	// Phase 3: Show detailed state
